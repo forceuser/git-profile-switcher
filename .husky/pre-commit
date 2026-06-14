@@ -1,0 +1,2 @@
+#!/usr/bin/env sh
+exec ./node_modules/.bin/lint-staged --config lint-staged.config.mjs --allow-empty

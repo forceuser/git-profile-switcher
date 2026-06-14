@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.artifacts/
+.npm/
+*.tgz
+
+# local gip state
+.git-profile-switcher/

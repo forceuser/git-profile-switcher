@@ -1,0 +1,105 @@
+{
+  "name": "@forceuser/git-profile-switcher",
+  "version": "0.1.4",
+  "private": false,
+  "description": "CLI and TUI for automatic per-directory Git user identity switching.",
+  "keywords": [
+    "cli",
+    "git",
+    "identity",
+    "profile",
+    "tui"
+  ],
+  "homepage": "https://github.com/forceuser/git-profile-switcher#readme",
+  "bugs": {
+    "url": "https://github.com/forceuser/git-profile-switcher/issues"
+  },
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/forceuser/git-profile-switcher.git"
+  },
+  "bin": {
+    "gip": "./bin/gip.mjs",
+    "git-profile-switcher": "./bin/gip.mjs"
+  },
+  "files": [
+    "bin/",
+    "dist/runtime/",
+    "README.md"
+  ],
+  "type": "module",
+  "imports": {
+    "#app/*": {
+      "gip-source": "./runtime/app/*.ts",
+      "default": "./dist/runtime/app/*.js"
+    },
+    "#cli/*": {
+      "gip-source": "./runtime/cli/*.ts",
+      "default": "./dist/runtime/cli/*.js"
+    },
+    "#config/*": {
+      "gip-source": "./runtime/config/*.ts",
+      "default": "./dist/runtime/config/*.js"
+    },
+    "#git/*": {
+      "gip-source": "./runtime/git/*.ts",
+      "default": "./dist/runtime/git/*.js"
+    },
+    "#profiles/*": {
+      "gip-source": "./runtime/profiles/*.ts",
+      "default": "./dist/runtime/profiles/*.js"
+    },
+    "#prompt/*": {
+      "gip-source": "./runtime/prompt/*.ts",
+      "default": "./dist/runtime/prompt/*.js"
+    },
+    "#shell/*": {
+      "gip-source": "./runtime/shell/*.ts",
+      "default": "./dist/runtime/shell/*.js"
+    },
+    "#tui/*": {
+      "gip-source": "./runtime/tui/*.ts",
+      "default": "./dist/runtime/tui/*.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "prepare": "node --conditions=gip-source --experimental-strip-types scripts/setup-husky.ts",
+    "dev": "node --conditions=gip-source --experimental-strip-types runtime/app/index.ts",
+    "start": "node --conditions=gip-source --experimental-strip-types runtime/app/index.ts",
+    "build": "tsc --project tsconfig.build.json",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint . --fix",
+    "fmt": "oxfmt .",
+    "fmt:check": "oxfmt --check .",
+    "check:lint-staged": "lint-staged --config lint-staged.config.mjs --allow-empty",
+    "typecheck": "tsc --noEmit",
+    "test": "node --conditions=gip-source --experimental-strip-types --test",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run verify:publish",
+    "smoke:package": "node --conditions=gip-source --experimental-strip-types scripts/smoke-package.ts",
+    "verify": "npm run lint && npm run fmt:check && npm run typecheck && npm test && npm run build",
+    "verify:publish": "npm run verify && npm run smoke:package",
+    "release:check-tag": "node --conditions=gip-source --experimental-strip-types scripts/check-release-tag.ts",
+    "bump": "node --conditions=gip-source --experimental-strip-types scripts/bump-version.ts",
+    "bump:patch": "node --conditions=gip-source --experimental-strip-types scripts/bump-version.ts patch",
+    "bump:minor": "node --conditions=gip-source --experimental-strip-types scripts/bump-version.ts minor",
+    "bump:major": "node --conditions=gip-source --experimental-strip-types scripts/bump-version.ts major"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
+    "oxfmt": "^0.42.0",
+    "oxlint": "^1.68.0",
+    "typescript": "^6.0.3"
+  },
+  "engines": {
+    "node": ">=22.14.0"
+  },
+  "packageManager": "pnpm@11.6.0+sha512.9a36518224080c6fe5165afdcfe79bfa118c29be703f3f462b1e32efe1e98e47e8750b148e08286250aad4113cc7993ca413c4e2cd447752708c2ee5751bc95f"
+}
