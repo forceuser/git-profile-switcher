@@ -1,6 +1,6 @@
 {
   "name": "@forceuser/git-profile-switcher",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": false,
   "description": "CLI and TUI for automatic per-directory Git user identity switching.",
   "keywords": [
