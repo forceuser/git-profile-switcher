@@ -60,18 +60,18 @@ config files and refreshes the managed block in the global Git config.
 
 ## Migration
 
-- `export [--output <path>] [--profiles-only]` writes a portable backup bundle
-  containing profiles and directory rules. When no output path is provided, it writes
+- `export [--output <path>] [--rules]` writes a portable backup bundle containing
+  profiles by default. Add `--rules` to include directory rules. When no output path is provided, it writes
   `~/gip-profiles.json`.
-- `import [--input <path>] [--replace] [--profiles-only] [--no-apply]` reads a backup bundle and merges it
-  into the local profile store by default. When no input path is provided, it reads
+- `import [--input <path>] [--replace] [--rules] [--no-apply]` reads a backup bundle and merges it
+  into the local profile store by default. Add `--rules` to import directory rules from the bundle.
+  When no input path is provided, it reads
   `~/gip-profiles.json`.
 
 `import --replace` swaps the local profile store with the imported one. After import, the
 CLI runs `apply` automatically so generated Git config files and the managed global
 `includeIf` block are refreshed for the new machine. Use `--no-apply` when you only want
-to update metadata. Use `--profiles-only` with export or import to transfer profile
-records without directory rules.
+to update metadata. Directory rules are skipped unless `--rules` is provided.
 
 ## Diagnostics
 

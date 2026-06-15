@@ -1,96 +1,177 @@
 # Git Profile Switcher
 
-`gip` is a small local-first CLI/TUI for managing multiple Git identities and applying
-them automatically per directory with Git `includeIf`.
+`gip` helps you use the right Git identity in the right directory.
 
-It keeps profile metadata in app data, writes generated profile config files, and manages
-one clearly marked block in your global `~/.gitconfig`.
+It stores named profiles, writes Git `includeIf` rules for directory-based switching,
+and can show the active profile in your shell prompt.
+
+## Install
+
+```bash
+npm install -g @forceuser/git-profile-switcher
+```
+
+After installation, the CLI is available as both:
+
+```bash
+gip --help
+git-profile-switcher --help
+```
 
 ## Quick Start
 
+Create your profiles:
+
 ```bash
-npm test
-npm run dev -- profile:add
-npm run dev -- profile:add work --user-name "Work Name" --user-email work@example.com
-npm run dev -- use
-npm run dev -- use work
-npm run dev -- prompt
-npm run dev -- prompt --format profile
+gip profile:add personal
+gip profile:add work --user-name "Work Name" --user-email work@example.com
 ```
 
-## Common Commands
+Use a profile in the current directory:
 
 ```bash
-gip profile:add
-gip profile:add work --user-name "Work Name" --user-email work@example.com
-gip profile:list
-gip profile:color work cyan
-gip use
+cd ~/Projects/work-app
 gip use work
-gip use work --global
+```
+
+From now on, Git uses that profile in this directory and its Git repositories.
+
+Check what Git identity is active:
+
+```bash
+gip doctor
+```
+
+## Daily Use
+
+Pick from your saved profiles:
+
+```bash
+gip use
+```
+
+Set a global fallback identity:
+
+```bash
+gip use personal --global
+```
+
+Clear the current directory rule:
+
+```bash
+gip clear
+```
+
+Clear the global fallback identity:
+
+```bash
+gip clear --global
+```
+
+Open the terminal UI:
+
+```bash
+gip tui
+```
+
+## Session-Only Identity
+
+Use `now` when you want a profile only in the current terminal session:
+
+```bash
+gip install:shell zsh
+source ~/.zshrc
+
 gip now work
 gip now --clear
-gip clear
-gip clear --global
-gip rule:add ~/Developer/Work
-gip rule:add work ~/Developer/Work
-gip rule:list
-gip apply
-gip doctor
-gip prompt --format profile
-gip tui
-gip install:shell zsh
-gip install:prompt zsh
-gip install:prompt zsh --format profile
 ```
 
-## Development
+Without shell integration, use:
 
 ```bash
-npm install
-npm run verify
-npm run verify:publish
+eval "$(gip now work --exports)"
 ```
-
-`npm install` runs the local Husky setup when the checkout has a `.git` directory.
-Pre-commit runs `lint-staged`; pre-push runs `npm run verify`.
-
-## Publication
-
-The package builds to `dist/` and publishes only `bin/`, `dist/runtime/`, `README.md`,
-and `package.json`.
-
-```bash
-npm run build
-npm run smoke:package
-npm run verify:publish
-```
-
-GitHub Actions publishes to the public npm registry from SemVer tags or GitHub releases.
-See [Release With GitHub Actions](./docs/operations/release-with-github-actions.md).
 
 ## Shell Prompt
 
-After installing prompt integration, your shell prompt can show the effective Git identity
-for the current directory. The prompt command itself is intentionally plain:
+Install prompt integration to show the active profile in your prompt:
 
 ```bash
-gip prompt
-gip prompt --json
+gip install:prompt zsh
+source ~/.zshrc
 ```
 
-Use `gip profile:color` to color the managed profile segment in installed shell prompts.
+Choose prompt colors per profile:
 
-## Storage
+```bash
+gip profile:color work cyan
+```
 
-Default app data lives at:
+Install completion, session wrapper, and prompt integration together:
+
+```bash
+gip install:all zsh
+```
+
+Supported shells: `zsh`, `bash`, and `fish`.
+
+## Move To A New Machine
+
+Export profiles:
+
+```bash
+gip export
+```
+
+Import profiles on another machine:
+
+```bash
+gip import
+```
+
+By default, both commands use:
+
+```text
+~/gip-profiles.json
+```
+
+Directory rules are machine-specific, so `gip` skips them by default. Include them only
+when you explicitly want to migrate the same directory mappings:
+
+```bash
+gip export --rules
+gip import --rules
+```
+
+## Where Data Lives
+
+Profile metadata:
 
 ```text
 ~/.config/git-profile-switcher/
 ```
 
-Generated Git config snippets live under:
+Generated Git config snippets:
 
 ```text
 ~/.config/git-profile-switcher/gitconfigs/
 ```
+
+`gip` manages one marked block in your global Git config and leaves unrelated content
+alone.
+
+## Useful Commands
+
+```bash
+gip profile:list
+gip profile:remove work
+gip rule:list
+gip rule:add work ~/Projects/work-app
+gip rule:remove <rule-id>
+gip paths
+gip prompt
+gip help <command>
+```
+
+For development and release notes, see
+[Development](https://github.com/forceuser/git-profile-switcher/blob/main/docs/development.md).

@@ -204,8 +204,8 @@ async function diagnosticsMenu(context: TuiContext) {
 
 async function migrationMenu(context: TuiContext) {
   return await runMenu(context, "Import and export", [
-    { label: "Export profiles and rules", run: () => exportProfiles(context) },
-    { label: "Import profiles and rules", run: () => importProfiles(context) },
+    { label: "Export profiles", run: () => exportProfiles(context) },
+    { label: "Import profiles", run: () => importProfiles(context) },
     { label: "Back", run: async () => "back" },
   ]);
 }
@@ -626,9 +626,9 @@ async function selectPromptFormat(context: TuiContext): Promise<PromptFormat> {
 }
 
 async function selectTransferScope(context: TuiContext, prompt: string) {
-  const scopes: Array<"profiles-and-rules" | "profiles-only"> = [
-    "profiles-and-rules",
+  const scopes: Array<"profiles-only" | "profiles-and-rules"> = [
     "profiles-only",
+    "profiles-and-rules",
   ];
   const scope = await context.prompts.selectOne({
     prompt,

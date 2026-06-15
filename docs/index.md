@@ -5,6 +5,7 @@ Start here before implementation files.
 ## Start Here
 
 - [Backlog](./backlog.md) - current delivery status and next increments.
+- [Development](./development.md) - local setup, verification, and release workflow.
 - [Architecture](./architecture/index.md) - system map and module boundaries.
 - [CLI and TUI](./features/cli-and-tui.md) - user-facing command and terminal flows.
 - [Shell Prompt](./features/shell-prompt.md) - prompt integration behavior.

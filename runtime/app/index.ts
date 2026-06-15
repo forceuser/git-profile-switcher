@@ -319,7 +319,7 @@ export async function main(args = process.argv.slice(2)) {
 
   if (command === "export") {
     const data = await repository.read();
-    const exportData = hasFlag(parsed, "profiles-only") ? { ...data, rules: [] } : data;
+    const exportData = hasFlag(parsed, "rules") ? data : { ...data, rules: [] };
     const bundle = createProfileExportBundle(exportData);
     const outputPath =
       getStringFlag(parsed, "output") ??
@@ -351,7 +351,7 @@ export async function main(args = process.argv.slice(2)) {
     const incoming = parseProfileImportBundle(
       JSON.parse(await readFile(resolvedInputPath, "utf8")),
     );
-    const importData = hasFlag(parsed, "profiles-only") ? { ...incoming, rules: [] } : incoming;
+    const importData = hasFlag(parsed, "rules") ? incoming : { ...incoming, rules: [] };
     const current = await repository.read();
     const next = hasFlag(parsed, "replace")
       ? importData

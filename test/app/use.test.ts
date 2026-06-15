@@ -716,7 +716,7 @@ test("install all installs completion and prompt blocks without global package i
   }
 });
 
-test("export and import transfer profiles and rules", async () => {
+test("export and import transfer rules when requested", async () => {
   const sourceDir = await mkdtemp(join(tmpdir(), "gip-export-source-"));
   const targetDir = await mkdtemp(join(tmpdir(), "gip-import-target-"));
   const transferHome = join(sourceDir, "home");
@@ -745,11 +745,11 @@ test("export and import transfer profiles and rules", async () => {
     await execGip(["profile:color", "work", "cyan"], { cwd: sourceDir, env: sourceEnv });
     await execGip(["use", "work", projectDir], { cwd: sourceDir, env: sourceEnv });
 
-    const exported = await execGip(["export"], {
+    const exported = await execGip(["export", "--rules"], {
       cwd: sourceDir,
       env: sourceEnv,
     });
-    const imported = await execGip(["import"], {
+    const imported = await execGip(["import", "--rules"], {
       cwd: targetDir,
       env: targetEnv,
     });
@@ -774,7 +774,7 @@ test("export and import transfer profiles and rules", async () => {
   }
 });
 
-test("import --profiles-only skips directory rules", async () => {
+test("import skips directory rules by default", async () => {
   const sourceDir = await mkdtemp(join(tmpdir(), "gip-export-profiles-only-source-"));
   const targetDir = await mkdtemp(join(tmpdir(), "gip-import-profiles-only-target-"));
   const exportPath = join(sourceDir, "profiles.json");
@@ -797,9 +797,12 @@ test("import --profiles-only skips directory rules", async () => {
       { cwd: sourceDir, env: sourceEnv },
     );
     await execGip(["use", "work", projectDir], { cwd: sourceDir, env: sourceEnv });
-    await execGip(["export", "--output", exportPath], { cwd: sourceDir, env: sourceEnv });
+    await execGip(["export", "--rules", "--output", exportPath], {
+      cwd: sourceDir,
+      env: sourceEnv,
+    });
 
-    const imported = await execGip(["import", "--input", exportPath, "--profiles-only"], {
+    const imported = await execGip(["import", "--input", exportPath], {
       cwd: targetDir,
       env: targetEnv,
     });
@@ -822,7 +825,7 @@ test("import --profiles-only skips directory rules", async () => {
   }
 });
 
-test("export --profiles-only writes profiles without directory rules", async () => {
+test("export writes profiles without directory rules by default", async () => {
   const dir = await mkdtemp(join(tmpdir(), "gip-export-profiles-only-"));
   const exportPath = join(dir, "profiles-only.json");
   const projectDir = join(dir, "project");
@@ -840,7 +843,7 @@ test("export --profiles-only writes profiles without directory rules", async () 
     );
     await execGip(["use", "work", projectDir], { cwd: dir, env });
 
-    const exported = await execGip(["export", "--profiles-only", "--output", exportPath], {
+    const exported = await execGip(["export", "--output", exportPath], {
       cwd: dir,
       env,
     });
