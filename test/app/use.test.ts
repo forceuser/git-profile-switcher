@@ -11,8 +11,8 @@ const execFileAsync = promisify(execFile);
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const runtimeApp = join(root, "runtime", "app", "index.ts");
 
-test("use assigns a profile to the current directory and applies git config", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "gip-use-"));
+test("bind assigns a profile to the current directory and applies git config", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-bind-"));
   const appDataParent = join(dir, "config");
   const globalGitConfigPath = join(dir, ".gitconfig");
   const projectDir = join(dir, "project");
@@ -32,12 +32,12 @@ test("use assigns a profile to the current directory and applies git config", as
       },
     );
 
-    const { stdout } = await execGip(["use", "work"], {
+    const { stdout } = await execGip(["bind", "work"], {
       cwd: projectDir,
       env,
     });
 
-    assert.match(stdout, /Using profile work for /);
+    assert.match(stdout, /Bound profile work for /);
     assert.match(stdout, /Generated 1 profile config file/);
 
     const profiles = JSON.parse(
@@ -54,8 +54,8 @@ test("use assigns a profile to the current directory and applies git config", as
   }
 });
 
-test("use --global writes the selected profile to global gitconfig", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "gip-use-global-"));
+test("bind --global writes the selected profile to global gitconfig", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-bind-global-"));
   const appDataParent = join(dir, "config");
   const globalGitConfigPath = join(dir, ".gitconfig");
   const env = {
@@ -74,12 +74,12 @@ test("use --global writes the selected profile to global gitconfig", async () =>
       },
     );
 
-    const { stdout } = await execGip(["use", "work", "--global"], {
+    const { stdout } = await execGip(["bind", "work", "--global"], {
       cwd: dir,
       env,
     });
 
-    assert.match(stdout, /Using global profile work: Work Name <work@example\.com>/);
+    assert.match(stdout, /Bound global profile work: Work Name <work@example\.com>/);
     const gitConfig = await readFile(globalGitConfigPath, "utf8");
     assert.match(gitConfig, /\[user\]/);
     assert.match(gitConfig, /name = Work Name/);
@@ -95,8 +95,8 @@ test("use --global writes the selected profile to global gitconfig", async () =>
   }
 });
 
-test("now prints session-scoped Git identity environment", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "gip-now-"));
+test("use prints session-scoped Git identity environment", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-use-session-"));
   const env = {
     ...process.env,
     GIP_APP_DATA_DIR: join(dir, "config"),
@@ -110,11 +110,11 @@ test("now prints session-scoped Git identity environment", async () => {
     );
     await execGip(["profile:color", "work", "cyan"], { cwd: dir, env });
 
-    const plain = await execGip(["now", "work"], { cwd: dir, env });
+    const plain = await execGip(["use", "work"], { cwd: dir, env });
     assert.match(plain.stdout, /Selected session profile work/);
     assert.doesNotMatch(plain.stdout, /export GIP_PROFILE_NAME/);
 
-    const bash = await execGip(["now", "work", "--exports", "--shell", "bash"], { cwd: dir, env });
+    const bash = await execGip(["use", "work", "--exports", "--shell", "bash"], { cwd: dir, env });
     assert.match(bash.stdout, /export GIP_PROFILE_NAME='work'/);
     assert.match(bash.stdout, /export GIT_AUTHOR_NAME='Work Name'/);
     assert.match(bash.stdout, /export GIT_AUTHOR_EMAIL='work@example\.com'/);
@@ -126,10 +126,10 @@ test("now prints session-scoped Git identity environment", async () => {
     assert.match(bash.stdout, /export GIT_CONFIG_KEY_1='user\.email'/);
     assert.match(bash.stdout, /export GIT_CONFIG_VALUE_1='work@example\.com'/);
 
-    const fish = await execGip(["now", "work", "--exports", "--shell", "fish"], { cwd: dir, env });
+    const fish = await execGip(["use", "work", "--exports", "--shell", "fish"], { cwd: dir, env });
     assert.match(fish.stdout, /set -gx GIP_PROFILE_NAME 'work'/);
 
-    const selected = await spawnGip(["now", "--exports", "--shell", "bash"], {
+    const selected = await spawnGip(["use", "--exports", "--shell", "bash"], {
       cwd: dir,
       env,
       input: "\n",
@@ -137,7 +137,7 @@ test("now prints session-scoped Git identity environment", async () => {
     assert.match(selected.stderr, profileOptionPattern(1, "work", "Work Name", "work@example.com"));
     assert.match(selected.stdout, /export GIP_PROFILE_NAME='work'/);
 
-    const clear = await execGip(["now", "--clear", "--exports", "--shell", "bash"], {
+    const clear = await execGip(["use", "--clear", "--exports", "--shell", "bash"], {
       cwd: dir,
       env,
     });
@@ -177,28 +177,28 @@ test("profile selectors default to the active profile", async () => {
       ["profile:add", "work", "--user-name", "Work Name", "--user-email", "work@example.com"],
       { cwd: dir, env },
     );
-    await execGip(["use", "work"], { cwd: projectDir, env });
+    await execGip(["bind", "work"], { cwd: projectDir, env });
 
-    const selectedUse = await spawnGip(["use"], {
+    const selectedBind = await spawnGip(["bind"], {
       cwd: projectDir,
       env,
       input: "\n",
     });
-    assert.match(selectedUse.stdout, /Using profile work for /);
+    assert.match(selectedBind.stdout, /Bound profile work for /);
 
-    const selectedNow = await spawnGip(["now", "--exports", "--shell", "bash"], {
+    const selectedSessionUse = await spawnGip(["use", "--exports", "--shell", "bash"], {
       cwd: dir,
       env: { ...env, GIP_PROFILE_NAME: "work" },
       input: "\n",
     });
-    assert.match(selectedNow.stdout, /export GIP_PROFILE_NAME='work'/);
+    assert.match(selectedSessionUse.stdout, /export GIP_PROFILE_NAME='work'/);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
 });
 
-test("prompt uses now session environment before git config", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "gip-now-prompt-"));
+test("prompt uses session environment before git config", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-use-session-prompt-"));
   const appDataParent = join(dir, "config");
   const globalGitConfigPath = join(dir, ".gitconfig");
   const env = {
@@ -225,7 +225,7 @@ test("prompt uses now session environment before git config", async () => {
       { cwd: dir, env },
     );
     await execGip(["profile:color", "session", "cyan"], { cwd: dir, env });
-    await execGip(["use", "global", "--global"], { cwd: dir, env });
+    await execGip(["bind", "global", "--global"], { cwd: dir, env });
 
     const prompt = await execGip(["prompt"], {
       cwd: dir,
@@ -265,7 +265,7 @@ test("profile:color sets prompt color for shell prompt output", async () => {
         env,
       },
     );
-    await execGip(["use", "work", "--global"], { cwd: dir, env });
+    await execGip(["bind", "work", "--global"], { cwd: dir, env });
 
     const { stdout } = await execGip(["profile:color", "work", "cyan"], {
       cwd: dir,
@@ -313,7 +313,7 @@ test("clear removes the current directory profile rule and applies git config", 
         env,
       },
     );
-    await execGip(["use", "work"], {
+    await execGip(["bind", "work"], {
       cwd: projectDir,
       env,
     });
@@ -364,11 +364,11 @@ test("prompt prefers managed directory profile over global git identity", async 
         env,
       },
     );
-    await execGip(["use", "personal", "--global"], {
+    await execGip(["bind", "personal", "--global"], {
       cwd: dir,
       env,
     });
-    await execGip(["use", "work"], {
+    await execGip(["bind", "work"], {
       cwd: projectDir,
       env,
     });
@@ -419,7 +419,7 @@ test("clear --global removes global git identity", async () => {
         env,
       },
     );
-    await execGip(["use", "work", "-g"], {
+    await execGip(["bind", "work", "-g"], {
       cwd: dir,
       env,
     });
@@ -473,8 +473,8 @@ test("profile:add prompts for missing profile fields", async () => {
   }
 });
 
-test("use prompts for a profile when none is passed", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "gip-use-select-"));
+test("bind prompts for a profile when none is passed", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-bind-select-"));
   const appDataParent = join(dir, "config");
   const globalGitConfigPath = join(dir, ".gitconfig");
   const projectDir = join(dir, "project");
@@ -496,7 +496,7 @@ test("use prompts for a profile when none is passed", async () => {
     );
     await execGip(["profile:color", "work", "cyan"], { cwd: dir, env });
 
-    const { stdout } = await spawnGip(["use"], {
+    const { stdout } = await spawnGip(["bind"], {
       cwd: projectDir,
       env,
       input: "2\n",
@@ -505,7 +505,7 @@ test("use prompts for a profile when none is passed", async () => {
     assert.match(stdout, /1\. personal\s+Personal Name <me@example\.com>/);
     assert.match(stdout, profileOptionPattern(2, "work", "Work Name", "work@example.com"));
     assert.match(stdout, /Choose profile \[1\]: /);
-    assert.match(stdout, /Using profile work for /);
+    assert.match(stdout, /Bound profile work for /);
 
     const profiles = JSON.parse(
       await readFile(join(appDataParent, "git-profile-switcher", "profiles.json"), "utf8"),
@@ -520,8 +520,8 @@ test("use prompts for a profile when none is passed", async () => {
   }
 });
 
-test("use defaults to the first profile when selection is empty", async () => {
-  const dir = await mkdtemp(join(tmpdir(), "gip-use-default-"));
+test("bind defaults to the first profile when selection is empty", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-bind-default-"));
   const appDataParent = join(dir, "config");
   const globalGitConfigPath = join(dir, ".gitconfig");
   const projectDir = join(dir, "project");
@@ -542,14 +542,14 @@ test("use defaults to the first profile when selection is empty", async () => {
       { cwd: dir, env },
     );
 
-    const { stdout } = await spawnGip(["use"], {
+    const { stdout } = await spawnGip(["bind"], {
       cwd: projectDir,
       env,
       input: "\n",
     });
 
     assert.match(stdout, /Choose profile \[1\]: /);
-    assert.match(stdout, /Using profile personal for /);
+    assert.match(stdout, /Bound profile personal for /);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -661,6 +661,32 @@ test("command --help prints command help without running the command", async () 
   }
 });
 
+test("version commands print the package version", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "gip-version-"));
+  const packageJson = JSON.parse(await readFile(join(root, "package.json"), "utf8")) as {
+    version: string;
+  };
+  const env = {
+    ...process.env,
+    GIP_APP_DATA_DIR: join(dir, "config"),
+    GIP_GLOBAL_GITCONFIG: join(dir, ".gitconfig"),
+  };
+
+  try {
+    const flag = await execGip(["--version"], { cwd: dir, env });
+    const shortFlag = await execGip(["-v"], { cwd: dir, env });
+    const globalFlag = await execGip(["prompt", "--version"], { cwd: dir, env });
+    const command = await execGip(["version"], { cwd: dir, env });
+
+    assert.equal(flag.stdout.trim(), packageJson.version);
+    assert.equal(shortFlag.stdout.trim(), packageJson.version);
+    assert.equal(globalFlag.stdout.trim(), packageJson.version);
+    assert.equal(command.stdout.trim(), packageJson.version);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test("__complete suggests saved profile names", async () => {
   const dir = await mkdtemp(join(tmpdir(), "gip-complete-profiles-"));
   const env = {
@@ -679,12 +705,17 @@ test("__complete suggests saved profile names", async () => {
       { cwd: dir, env },
     );
 
-    const { stdout } = await execGip(["__complete", "--shell", "zsh", "--", "use", ""], {
+    const bindCompletion = await execGip(["__complete", "--shell", "zsh", "--", "bind", ""], {
+      cwd: dir,
+      env,
+    });
+    const useCompletion = await execGip(["__complete", "--shell", "zsh", "--", "use", ""], {
       cwd: dir,
       env,
     });
 
-    assert.deepEqual(stdout.trim().split("\n"), ["personal", "work"]);
+    assert.deepEqual(bindCompletion.stdout.trim().split("\n"), ["personal", "work"]);
+    assert.deepEqual(useCompletion.stdout.trim().split("\n"), ["personal", "work"]);
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -743,7 +774,7 @@ test("export and import transfer rules when requested", async () => {
       { cwd: sourceDir, env: sourceEnv },
     );
     await execGip(["profile:color", "work", "cyan"], { cwd: sourceDir, env: sourceEnv });
-    await execGip(["use", "work", projectDir], { cwd: sourceDir, env: sourceEnv });
+    await execGip(["bind", "work", projectDir], { cwd: sourceDir, env: sourceEnv });
 
     const exported = await execGip(["export", "--rules"], {
       cwd: sourceDir,
@@ -796,7 +827,7 @@ test("import skips directory rules by default", async () => {
       ["profile:add", "work", "--user-name", "Work Name", "--user-email", "work@example.com"],
       { cwd: sourceDir, env: sourceEnv },
     );
-    await execGip(["use", "work", projectDir], { cwd: sourceDir, env: sourceEnv });
+    await execGip(["bind", "work", projectDir], { cwd: sourceDir, env: sourceEnv });
     await execGip(["export", "--rules", "--output", exportPath], {
       cwd: sourceDir,
       env: sourceEnv,
@@ -841,7 +872,7 @@ test("export writes profiles without directory rules by default", async () => {
       ["profile:add", "work", "--user-name", "Work Name", "--user-email", "work@example.com"],
       { cwd: dir, env },
     );
-    await execGip(["use", "work", projectDir], { cwd: dir, env });
+    await execGip(["bind", "work", projectDir], { cwd: dir, env });
 
     const exported = await execGip(["export", "--output", exportPath], {
       cwd: dir,

@@ -17,9 +17,9 @@ and bright variants except white.
 
 ## Directory Rules
 
-- `use [profile] [directory]`
-- `use [profile] --global`
-- `now [profile] [--clear]`
+- `bind [profile] [directory]`
+- `bind [profile] --global`
+- `use [profile] [--clear]`
 - `clear [directory]`
 - `clear --global`
 - `rule:add [profile] [directory]`
@@ -27,24 +27,24 @@ and bright variants except white.
 - `rule:remove <rule-id>`
 - `apply`
 
-`use` is the shortest path for the current project: it assigns a profile to the current
+`bind` is the shortest path for the current project: it assigns a profile to the current
 directory when `[directory]` is omitted, replaces any exact-path managed rule for another
 profile, and runs `apply`.
 
-When `[profile]` is omitted, `use` shows the saved profiles and accepts either a list
+When `[profile]` is omitted, `bind` shows the saved profiles and accepts either a list
 number or profile name.
 
-`use --global` sets the selected profile as the fallback Git `user.name` and `user.email`
+`bind --global` sets the selected profile as the fallback Git `user.name` and `user.email`
 in the global Git config instead of creating an `includeIf` directory rule.
 
-`now` sets the selected profile only for the current shell session through
+`use` sets the selected profile only for the current shell session through
 `GIP_PROFILE_NAME`, `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME`, and
 `GIT_COMMITTER_EMAIL`. It also sets Git's environment config override for `user.name`
 and `user.email`, so `git config --get user.email` reflects the session profile.
 Installed shell integration evaluates it automatically, so
-`gip now work` affects only the current terminal. Without shell integration, use
-`eval "$(gip now work --exports)"`. `gip now --clear` removes the session override when
-shell integration is installed; without it, use `eval "$(gip now --clear --exports)"`.
+`gip use work` affects only the current terminal. Without shell integration, use
+`eval "$(gip use work --exports)"`. `gip use --clear` removes the session override when
+shell integration is installed; without it, use `eval "$(gip use --clear --exports)"`.
 The `--exports` flag is the explicit machine-readable mode used by shell wrappers.
 
 `clear` removes the exact managed rule for the current directory, or `[directory]` when
@@ -79,6 +79,7 @@ to update metadata. Directory rules are skipped unless `--rules` is provided.
 - `prompt [--format identity|profile|auto] [--profile] [--json]` prints prompt-friendly
   identity or profile text.
 - `paths [--json]` reports app-data and Git config paths without mutating anything.
+- `version` and `--version` print the installed `gip` package version.
 
 ## Help And Completion
 
@@ -91,7 +92,7 @@ Every command supports `--help` and `-h`, and the same help text is available wi
 - `uninstall:completion [zsh|bash|fish] [--config <path>]` removes the managed completion
   block.
 - `install:shell [zsh|bash|fish] [--config <path>]` installs only the shell wrapper used
-  by session commands such as `gip now`.
+  by session commands such as `gip use`.
 - `uninstall:shell [zsh|bash|fish] [--config <path>]` removes the shell wrapper block.
 - `install [zsh|bash|fish]` installs the current package globally with npm, then installs
   the full shell bundle.
@@ -110,7 +111,7 @@ profile names, and rule ids where those values are expected.
 import/export migration, shell integration, and package install/update helpers. It uses
 the same arrow-key selector as interactive CLI prompts.
 The Profiles view opens as a selectable list with `[Add profile]` first; selecting an
-existing profile opens `[Use profile here <current-directory>]`, `[Edit profile]`, and
+existing profile opens `[Bind profile here <current-directory>]`, `[Edit profile]`, and
 `[Set prompt color]`, and `[Remove profile]` actions.
 Prompt-color selectors and profile rows show a colored `■` swatch beside selected colors.
 The Directory rules view opens as a selectable list with `[Add rule]` first; selecting

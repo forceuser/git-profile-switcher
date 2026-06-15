@@ -15,6 +15,7 @@ After installation, the CLI is available as both:
 
 ```bash
 gip --help
+gip --version
 git-profile-switcher --help
 ```
 
@@ -27,11 +28,11 @@ gip profile:add personal
 gip profile:add work --user-name "Work Name" --user-email work@example.com
 ```
 
-Use a profile in the current directory:
+Bind a profile to the current directory:
 
 ```bash
 cd ~/Projects/work-app
-gip use work
+gip bind work
 ```
 
 From now on, Git uses that profile in this directory and its Git repositories.
@@ -47,13 +48,13 @@ gip doctor
 Pick from your saved profiles:
 
 ```bash
-gip use
+gip bind
 ```
 
 Set a global fallback identity:
 
 ```bash
-gip use personal --global
+gip bind personal --global
 ```
 
 Clear the current directory rule:
@@ -76,20 +77,20 @@ gip tui
 
 ## Session-Only Identity
 
-Use `now` when you want a profile only in the current terminal session:
+Use `use` when you want a profile only in the current terminal session:
 
 ```bash
 gip install:shell zsh
 source ~/.zshrc
 
-gip now work
-gip now --clear
+gip use work
+gip use --clear
 ```
 
 Without shell integration, use:
 
 ```bash
-eval "$(gip now work --exports)"
+eval "$(gip use work --exports)"
 ```
 
 ## Shell Prompt
@@ -163,6 +164,7 @@ alone.
 ## Useful Commands
 
 ```bash
+gip bind work ~/Projects/work-app
 gip profile:list
 gip profile:remove work
 gip rule:list
@@ -170,6 +172,7 @@ gip rule:add work ~/Projects/work-app
 gip rule:remove <rule-id>
 gip paths
 gip prompt
+gip version
 gip help <command>
 ```
 

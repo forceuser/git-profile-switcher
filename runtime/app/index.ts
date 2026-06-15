@@ -57,11 +57,19 @@ export async function main(args = process.argv.slice(2)) {
   const command = args[0] ?? "help";
   const rest = args.slice(1);
   const parsed = parseArgs(rest);
-  const paths = getAppPaths();
-  const repository = createProfileRepository(paths.profilesPath);
 
   if (command === "help" || command === "--help" || command === "-h") {
     console.log(renderHelp(parsed.positionals[0]));
+    return;
+  }
+
+  if (
+    command === "version" ||
+    command === "--version" ||
+    command === "-v" ||
+    hasFlag(parsed, "version")
+  ) {
+    console.log(readPackageVersion() ?? "unknown");
     return;
   }
 
@@ -69,6 +77,9 @@ export async function main(args = process.argv.slice(2)) {
     console.log(renderHelp(command));
     return;
   }
+
+  const paths = getAppPaths();
+  const repository = createProfileRepository(paths.profilesPath);
 
   if (command === "__complete") {
     const separatorIndex = rest.indexOf("--");
@@ -197,7 +208,7 @@ export async function main(args = process.argv.slice(2)) {
     return;
   }
 
-  if (command === "use") {
+  if (command === "bind") {
     const data = await repository.read();
     const profileName =
       parsed.positionals[0] ??
@@ -209,7 +220,7 @@ export async function main(args = process.argv.slice(2)) {
         globalGitConfigPath: paths.globalGitConfigPath,
       });
       console.log(
-        `Using global profile ${profile.name}: ${profile.userName} <${profile.userEmail}>`,
+        `Bound global profile ${profile.name}: ${profile.userName} <${profile.userEmail}>`,
       );
       console.log(
         result.changed
@@ -231,7 +242,7 @@ export async function main(args = process.argv.slice(2)) {
       globalGitConfigPath: paths.globalGitConfigPath,
       generatedGitConfigDir: paths.generatedGitConfigDir,
     });
-    console.log(`Using profile ${rule.profileName} for ${rule.directory}`);
+    console.log(`Bound profile ${rule.profileName} for ${rule.directory}`);
     console.log(`Generated ${result.generatedFiles.length} profile config file(s).`);
     console.log(
       result.changed
@@ -241,14 +252,14 @@ export async function main(args = process.argv.slice(2)) {
     return;
   }
 
-  if (command === "now") {
+  if (command === "use") {
     const shell = resolveShell(parsed, undefined) ?? "bash";
     const printExports = hasFlag(parsed, "exports");
     if (hasFlag(parsed, "clear")) {
       console.log(
         printExports
           ? renderSessionIdentityClear(shell)
-          : 'Use shell integration or run `eval "$(gip now --clear --exports)"` to clear the current shell session.',
+          : 'Use shell integration or run `eval "$(gip use --clear --exports)"` to clear the current shell session.',
       );
       return;
     }
@@ -260,7 +271,7 @@ export async function main(args = process.argv.slice(2)) {
     console.log(
       printExports
         ? renderSessionIdentityExports(profile, shell)
-        : `Selected session profile ${profile.name}. Use shell integration or run \`eval "$(gip now ${profile.name} --exports)"\` to apply it in this shell.`,
+        : `Selected session profile ${profile.name}. Use shell integration or run \`eval "$(gip use ${profile.name} --exports)"\` to apply it in this shell.`,
     );
     return;
   }

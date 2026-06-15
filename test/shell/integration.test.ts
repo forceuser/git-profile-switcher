@@ -56,10 +56,11 @@ test("renderCompletionBlock wraps generated completion script", () => {
   assert.match(block, /# <<< gip completion <<</);
 });
 
-test("renderShellSessionBlock wraps now session command", () => {
+test("renderShellSessionBlock wraps use session command", () => {
   const block = renderShellSessionBlock("zsh");
 
   assert.match(block, /# >>> gip shell >>>/);
+  assert.match(block, /\[ "\$\{1:-\}" = "use" \]/);
   assert.match(block, /gip_session="\$\(command gip "\$@" --exports --shell zsh\)"/);
   assert.match(block, /eval "\$gip_session"/);
   assert.match(block, /# <<< gip shell <<</);

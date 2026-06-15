@@ -18,7 +18,9 @@ test("buildCompletionSuggestions suggests commands and flags", async () => {
   try {
     assert.deepEqual(await buildCompletionSuggestions(runtime, []), [
       "--help",
+      "--version",
       "apply",
+      "bind",
       "clear",
       "completion",
       "doctor",
@@ -29,7 +31,6 @@ test("buildCompletionSuggestions suggests commands and flags", async () => {
       "install:completion",
       "install:prompt",
       "install:shell",
-      "now",
       "paths",
       "profile:add",
       "profile:color",
@@ -46,6 +47,7 @@ test("buildCompletionSuggestions suggests commands and flags", async () => {
       "uninstall:shell",
       "update",
       "use",
+      "version",
     ]);
 
     assert.deepEqual(await buildCompletionSuggestions(runtime, ["prompt"]), [
@@ -53,6 +55,7 @@ test("buildCompletionSuggestions suggests commands and flags", async () => {
       "--help",
       "--json",
       "--profile",
+      "--version",
     ]);
     assert.deepEqual(await buildCompletionSuggestions(runtime, ["prompt", "--format", ""]), [
       "auto",
@@ -101,8 +104,8 @@ test("buildCompletionSuggestions suggests saved profiles and rules", async () =>
       directory: runtime.dir,
     });
 
+    assert.deepEqual(await buildCompletionSuggestions(runtime, ["bind", ""]), ["personal", "work"]);
     assert.deepEqual(await buildCompletionSuggestions(runtime, ["use", ""]), ["personal", "work"]);
-    assert.deepEqual(await buildCompletionSuggestions(runtime, ["now", ""]), ["personal", "work"]);
     assert.deepEqual(await buildCompletionSuggestions(runtime, ["profile:remove", ""]), [
       "personal",
       "work",

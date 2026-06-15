@@ -290,7 +290,7 @@ async function runCancellableAction(action: () => Promise<"continue" | "back" | 
 async function profileActionsMenu(context: TuiContext, profile: GitIdentityProfile) {
   return await runMenu(context, `Profile: ${profile.name}`, [
     {
-      label: `[Use profile here ${process.cwd()}]`,
+      label: `[Bind profile here ${process.cwd()}]`,
       run: () => useSelectedProfileForCurrentDirectory(context, profile),
     },
     { label: "[Edit profile]", run: () => editProfile(context, profile) },
@@ -406,7 +406,7 @@ async function useSelectedProfileForCurrentDirectory(
     directory: process.cwd(),
     homeDir: context.paths.homeDir,
   });
-  context.output.write(`Using profile ${rule.profileName} for ${rule.directory}\n`);
+  context.output.write(`Bound profile ${rule.profileName} for ${rule.directory}\n`);
   await applyConfig(context, false);
   return pause(context);
 }

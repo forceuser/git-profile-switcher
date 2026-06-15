@@ -9,7 +9,7 @@ export interface CompletionRuntime {
 }
 
 const COMMANDS = getHelpCommandNames();
-const GLOBAL_FLAGS = ["--help"] as const;
+const GLOBAL_FLAGS = ["--help", "--version"] as const;
 const SHELLS = ["bash", "fish", "zsh"] as const;
 const PROMPT_FORMATS = ["auto", "identity", "profile"] as const;
 const PROMPT_COLOR_CLEAR_VALUES = ["no-color", "none", "default"] as const;
@@ -109,7 +109,7 @@ async function completePositionalValue(
     return positionalWords.length <= 1 ? [...SHELLS] : [];
   }
 
-  if (command === "use" || command === "now" || command === "profile:remove") {
+  if (command === "bind" || command === "use" || command === "profile:remove") {
     return positionalWords.length <= 1 ? completeProfiles(runtime) : [];
   }
 

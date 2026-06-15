@@ -14,6 +14,11 @@ export function parseArgs(args: string[]): ParsedArgs {
       continue;
     }
 
+    if (arg === "-v") {
+      flags.set("version", true);
+      continue;
+    }
+
     if (arg === "-g") {
       flags.set("global", true);
       continue;

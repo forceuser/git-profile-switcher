@@ -229,7 +229,7 @@ ${SHELL_BLOCK_END}
 function renderSessionCommandWrapper(shell: SupportedShell) {
   if (shell === "fish") {
     return `function gip
-    if test (count $argv) -gt 0; and test "$argv[1]" = now; and not contains -- --help $argv; and not contains -- -h $argv
+    if test (count $argv) -gt 0; and test "$argv[1]" = use; and not contains -- --help $argv; and not contains -- -h $argv; and not contains -- --version $argv; and not contains -- -v $argv
         command gip $argv --exports --shell fish | source
     else
         command gip $argv
@@ -240,11 +240,11 @@ end
 
   const shellName = shell === "zsh" ? "zsh" : "bash";
   return `gip() {
-  if [ "\${1:-}" = "now" ]; then
+  if [ "\${1:-}" = "use" ]; then
     local gip_arg
     for gip_arg in "$@"; do
       case "$gip_arg" in
-        --help|-h)
+        --help|-h|--version|-v)
           command gip "$@"
           return
           ;;

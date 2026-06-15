@@ -20,13 +20,13 @@ git config user.name
 git config user.email
 ```
 
-It also respects session-scoped overrides set by `gip now`, using `GIP_PROFILE_NAME`,
+It also respects session-scoped overrides set by `gip use`, using `GIP_PROFILE_NAME`,
 `GIT_AUTHOR_NAME`, `GIT_AUTHOR_EMAIL`, `GIT_COMMITTER_NAME`, and `GIT_COMMITTER_EMAIL`
-before directory rules or global Git config. `gip now` also sets Git's environment
+before directory rules or global Git config. `gip use` also sets Git's environment
 config override for `user.name` and `user.email`, so Git config lookups in that shell
 see the session identity.
-Use `gip install:shell` to install only the shell wrapper that makes `gip now <profile>`
-affect the current shell without a manual `eval`. The wrapper calls `gip now --exports`
+Use `gip install:shell` to install only the shell wrapper that makes `gip use <profile>`
+affect the current shell without a manual `eval`. The wrapper calls `gip use --exports`
 internally, so interactive output stays separate from shell code.
 
 By default, `gip prompt` uses `--format auto`: it prints the matching managed profile
